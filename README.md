@@ -1,4 +1,6 @@
-# payload-next
+# CMS for Website Frontend
+
+**Repository:** `payload-next`
 
 This is the **headless CMS** for Sport Auto Plus, built on [Payload](https://payloadcms.com/).
 "Headless" means it has no public website of its own — it only manages content and data
