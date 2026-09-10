@@ -7,9 +7,10 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 import { isSuperAdmin } from './access/isSuperAdmin'
-import { Media } from './collections/Media'
+import { Media } from './collections/Media/Media'
 import { Tenants } from './collections/Tenants/Tenants'
 import { Users } from './collections/Users'
+import { CorporateIdentity } from './globals/CorporateIdentity/CorporateIdentity'
 import type { Config } from './payload-types'
 
 const filename = fileURLToPath(import.meta.url)
@@ -57,6 +58,7 @@ export default buildConfig({
     // into the admin layout by the generator.
   },
   collections: [Tenants, Users, Media],
+  globals: [CorporateIdentity],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

@@ -179,6 +179,36 @@ integration; it's documented in `website-next`'s
 and in the Datendrehscheibe's own README, purely for orientation if you're new to how the
 three projects fit together.
 
+## Corporate Identity (Design Tokens & Logo)
+
+The `corporate-identity` global holds the brand's design tokens and logo, editable in the
+admin panel (Globals → Corporate Identity) without a code change:
+
+- **`colors.primary` / `colors.secondary` / `colors.destructive`** — hex values, defaulting to
+  the actual Sport Auto Plus CD values. Plain text fields for now; a real color-picker UI
+  (like the old project's `ColorPickerField`) can replace them later without changing the
+  data shape.
+- **`logo`** — an upload field (Media). `pnpm exec tsx -r dotenv/config
+src/scripts/seedCorporateIdentity.ts` seeds it from the vendored master file
+  (`src/seeds/assets/sport-auto-plus-logo.svg`) plus a default `sportautoplus` tenant, if
+  neither exists yet — safe to re-run.
+
+`website-next` fetches this global (public read, no auth) and applies the colors as CSS
+custom properties, and renders the logo — see its own README and
+`.ai/backend/CMS_CLIENT.md`-style docs for the client code.
+
+### Media Is Always WebP (Except SVG)
+
+The `Media` collection's `beforeOperation` hook (`collections/Media/hooks/convertToWebp.ts`)
+converts every uploaded raster image (JPEG, PNG, GIF, TIFF, BMP) to WebP before it's stored —
+uploading a PNG through the admin panel results in a `.webp` file on disk. SVG is
+deliberately excluded: converting a vector logo/icon to WebP would rasterize it and throw
+away its scalability, which defeats the purpose. If you see a MIME-type validation error on
+an SVG upload, check that the file doesn't have a `<!DOCTYPE svg ...>` declaration — Payload's
+built-in SVG detection doesn't strip that before checking for the `<svg>` root tag, and
+misclassifies it as generic XML (common in Adobe Illustrator exports; safe to remove, it has
+no effect on rendering).
+
 ## Custom Admin Branding (Not Yet Configured)
 
 The admin panel currently uses Payload's own default look — no custom design has been built

@@ -89,8 +89,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'corporate-identity': CorporateIdentity;
+  };
+  globalsSelect: {
+    'corporate-identity': CorporateIdentitySelect<false> | CorporateIdentitySelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -375,6 +379,44 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "corporate-identity".
+ */
+export interface CorporateIdentity {
+  id: number;
+  /**
+   * Horizontal logo on a light background. Falls back to the static default in website-next/public/cd/logo if empty.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * Hex-Werte aus dem Corporate-Design-Dokument. Plain-Text-Felder für den Start — ein echtes Farbwähler-UI (siehe ColorPickerField-Muster in .ai/cms/ADMIN_COMPONENTS.md) kann später ergänzt werden.
+   */
+  colors: {
+    primary: string;
+    secondary: string;
+    destructive: string;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "corporate-identity_select".
+ */
+export interface CorporateIdentitySelect<T extends boolean = true> {
+  logo?: T;
+  colors?:
+    | T
+    | {
+        primary?: T;
+        secondary?: T;
+        destructive?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
