@@ -37,8 +37,8 @@ pnpm version: `^9 || ^10 || ^11`.
 - **Node.js** — a version matching the range above. Check yours with `node -v`.
 - **pnpm** — install it once with `corepack enable` (ships with Node), or see
   [pnpm's install docs](https://pnpm.io/installation).
-- **A running PostgreSQL 17 database** you can connect to — see the next section for how to
-  get and verify one.
+- **Docker Desktop** — running locally, to provide the Postgres database. Check it's running
+  with `docker info`; if that errors, open Docker Desktop and wait until it's ready.
 
 ## Setting Up the Project (Step by Step)
 
@@ -54,11 +54,10 @@ All commands below are run from inside this folder (`payload-next/`), unless not
    The defaults already point at the shared local database described below, so you normally
    don't need to change anything in `.env`.
 
-2. **Make sure a PostgreSQL 17 database is running and reachable** at the connection string
-   in your `.env` (`DATABASE_URL`). This repository doesn't start or manage that database
-   itself — how you run it depends on your local setup (a shared container used by the wider
-   Sport Auto Plus workspace, your own Docker container, a local Postgres install, ...). If
-   you're not sure whether one is already running, see
+2. **Make sure the shared Postgres 17 container is running** in Docker Desktop, reachable at
+   the connection string already set in your `.env` (`DATABASE_URL`). This repository
+   doesn't start that container itself — it's shared with other projects in the Sport Auto
+   Plus workspace. If you're not sure whether it's running, see
    [Checking the database connection](#checking-the-database-connection) below.
 
    This project keeps its own tables inside a dedicated schema (`DATABASE_SCHEMA=payload` in
@@ -88,25 +87,31 @@ All commands below are run from inside this folder (`payload-next/`), unless not
 
 ### Checking the database connection
 
-If a step above fails with a connection error, use one of these to check whether Postgres is
-actually reachable at the host/port configured in your `.env` (default: `127.0.0.1:5432`)
-before looking anywhere else:
+Postgres runs inside a Docker container, managed outside this repository (this project just
+connects to it — it doesn't start or own that container). If a step above fails with a
+connection error, check Docker Desktop first:
 
-```bash
-# If your database runs in Docker, see if any container is publishing port 5432:
-docker ps --filter "publish=5432"
+1. **Is Docker Desktop running at all?**
 
-# Works regardless of Docker — checks if anything is listening on the port at all:
-nc -z -v 127.0.0.1 5432 && echo "Something is listening on 5432"
+   ```bash
+   docker info
+   ```
 
-# If you have the Postgres command-line tools installed, this checks the server itself:
-pg_isready -h 127.0.0.1 -p 5432
-```
+   If this errors out, open Docker Desktop and wait until it says it's running.
 
-If none of these show anything running, you need to start your Postgres instance first —
-ask a teammate how the shared local database is started in this workspace, or start your own
-Postgres 17 (e.g. `docker run -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:17`) and
-update `DATABASE_URL` in `.env` to match.
+2. **Is a Postgres container actually up and listening on the port your `.env` expects**
+   (default `127.0.0.1:5432`)?
+
+   ```bash
+   docker ps --filter "publish=5432"
+   ```
+
+   You can check the same thing visually in the Docker Desktop app, under **Containers** —
+   look for one whose port mapping includes `5432`.
+
+If neither shows a running container, ask a teammate how the shared local database is
+started in this workspace — this repository assumes it's already available, not that you
+need to create it yourself.
 
 ### Creating your first admin account
 
