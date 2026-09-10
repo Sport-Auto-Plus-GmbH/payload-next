@@ -1,0 +1,91 @@
+---
+name: call-linting
+on:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  megalinter:
+    name: Linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: MegaLinter
+        id: ml
+        uses: oxsecurity/megalinter/flavors/javascript@v9.3.0
+        env:
+          # Validates all only on main, not on PRs
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == github.base_ref }}
+          GITHUB_COMMENT_REPORTER: ${{ github.event_name == 'pull_request' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload MegaLinter artifacts
+      - name: Archive production artifacts
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MegaLinter reports
+          path: |
+            megalinter-reports
+            mega-linter.log
+
+  test:
+    name: Tests (with coverage)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: saplus_dev
+          POSTGRES_PASSWORD: saplus_dev
+          POSTGRES_DB: datendrehscheibe_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Enable Corepack (pnpm)
+        run: corepack enable
+
+      - name: Create .npmrc for FontAwesome
+        run: |
+          printf "@fortawesome:registry=https://npm.fontawesome.com/\n" > .npmrc
+          printf "//npm.fontawesome.com/:_authToken=%s\n" "${{ secrets.FONTAWESOME_TOKEN }}" >> .npmrc
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply migrations to the test database
+        env:
+          DATABASE_URL: postgres://saplus_dev:saplus_dev@localhost:5432/datendrehscheibe_test
+          DATABASE_SCHEMA: payload
+          PAYLOAD_SECRET: test-secret-do-not-use-in-production
+        # `payload migrate` may ask for a y/N confirmation on a schema change; there's no
+        # TTY in CI to answer it, so pre-answer yes rather than let the job hang.
+        run: yes | pnpm migrate
+
+      - name: Run tests with coverage
+        run: pnpm test:coverage

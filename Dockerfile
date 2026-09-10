@@ -1,64 +1,39 @@
-# To use this Dockerfile, you have to set `output: 'standalone'` in your next.config.mjs file.
-# From https://github.com/vercel/next.js/blob/canary/examples/with-docker/Dockerfile
-
-FROM node:22.17.0-alpine AS base
-
-# Install dependencies only when needed
-FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-WORKDIR /app
-
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
-
-
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN \
-  if [ -f yarn.lock ]; then yarn run build; \
-  elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
-
-# Production image, copy all the files and run next
-FROM base AS runner
+# To use this Dockerfile, you have to set `output: 'standalone'` in next.config.ts.
+# Mirrors the old Payload repo's Dockerfile pattern: the CI workflow (c_build_and_deploy.yml)
+# builds on the host first (pnpm build), so this image just installs production
+# dependencies (needed for native deps like sharp that aren't always fully picked up by
+# Next's standalone output tracing) and copies the already-built standalone output in —
+# it does not rebuild from source itself.
+#
+# Not ported from the old Payload repo: its Dash0/OpenTelemetry instrumentation
+# (telemetry.cjs, dash0-info-logs.cjs) — that needs its own @opentelemetry/* dependencies
+# and endpoint configuration this project doesn't have yet. Add it deliberately later if
+# this project adopts the same observability setup.
+FROM node:22.17.0-alpine
 WORKDIR /app
 
 ENV NODE_ENV production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED 1
+
+# For build caching: copy only package files first
+COPY package.json pnpm-lock.yaml ./
+
+# FontAwesome auth mounted as a BuildKit secret (see c_build_and_deploy.yml's
+# `docker build --secret id=npmrc,src=.npmrc`) rather than baked into the image. Requires
+# package.json's "prepare" script to tolerate `husky` being unavailable (`husky || true`)
+# — it's a devDependency, and this is a --prod-only install.
+RUN --mount=type=secret,id=npmrc,target=/root/.npmrc \
+    corepack enable && pnpm install --prod --frozen-lockfile
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
-
-# Remove this line if you do not have this folder
-COPY --from=builder /app/public ./public
 
 # Set the correct permission for prerender cache
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --chown=nextjs:nodejs .next/standalone ./
+COPY --chown=nextjs:nodejs .next/static ./.next/static
+COPY --chown=nextjs:nodejs public ./public
 
 USER nextjs
 

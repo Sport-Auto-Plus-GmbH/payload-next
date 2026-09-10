@@ -24,7 +24,7 @@
     "test:unit": "cross-env NODE_OPTIONS=--no-deprecation vitest run tests/unit --config ./vitest.config.mts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run tests/int --config ./vitest.config.mts",
     "test:coverage": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts --coverage",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -80,6 +80,7 @@
     "node": "^18.20.2 || >=20.9.0",
     "pnpm": "^9 || ^10 || ^11"
   },
+  "packageManager": "pnpm@10.30.3",
   "pnpm": {
     "onlyBuiltDependencies": [
       "sharp",

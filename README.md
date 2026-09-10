@@ -250,6 +250,30 @@ deliberately excluded so it doesn't fight Payload's own admin panel styling ever
 This is scoped to the admin panel only — it has nothing to do with, and doesn't replace, the
 Website's own separate Tailwind setup.
 
+## CI/CD
+
+`.github/workflows/` — carried over from the old `Payload` repo, adapted for this project's
+pnpm/Next.js stack (no deployment/workflow-shape changes):
+
+- **`c_linting.yml`** — MegaLinter, plus a `test` job that applies migrations to a disposable
+  Postgres service container and runs `pnpm test:coverage` (see "Coverage" in
+  `.ai/quality/TESTING.md`). Runs on every PR.
+- **`pull_request_actions.yml`** — deploys to the `dev` environment when a PR is labeled
+  `deploy`.
+- **`c_build_and_deploy.yml`** — the actual build+deploy: builds on the runner
+  (`generate:types`, `generate:importmap`, `build`), then builds and pushes the Docker image
+  and deploys it to Azure App Service via the shared
+  `Sport-Auto-Plus-GmbH/infrastructure` action. Requires the same secrets as the old repo
+  (`FONTAWESOME_TOKEN`, `CONTAINER_REGISTRY_*`, `AZURE_*`) configured on this repo/its GitHub
+  Environments — not something this repo can set up on its own.
+
+The `Dockerfile` mirrors the old repo's pattern (builds once on the runner, the image just
+installs production dependencies and copies the pre-built `.next/standalone` output — not a
+second from-scratch build inside Docker). Not carried over: the old repo's Dash0/
+OpenTelemetry instrumentation (`telemetry.cjs`), since that needs its own dependencies and
+endpoint configuration this project doesn't have yet — add it deliberately if/when this
+project adopts the same observability setup.
+
 ## Troubleshooting
 
 - **`pnpm dev` can't connect to the database** — see
