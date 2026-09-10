@@ -21,6 +21,23 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    // Custom admin branding is not configured yet — using Payload's defaults for
+    // now. When a real design is ready, wire it in here rather than inventing a
+    // different mechanism (see src/components/branding/README.md):
+    //
+    // components: {
+    //   graphics: {
+    //     Logo: '@/components/branding/Logo',
+    //     Icon: '@/components/branding/Icon',
+    //   },
+    // },
+    // meta: {
+    //   titleSuffix: '- Sport Auto Plus',
+    //   icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/favicon.svg' }],
+    // },
+    //
+    // Global style overrides go in src/app/(payload)/custom.scss, already wired
+    // into the admin layout by the generator.
   },
   collections: [Tenants, Users, Media],
   editor: lexicalEditor(),

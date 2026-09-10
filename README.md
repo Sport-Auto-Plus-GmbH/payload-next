@@ -160,6 +160,18 @@ are assigned to, a role of `tenant-admin` (full access to that tenant's content)
 `tenant-viewer` (read-only). See [`.ai/backend/MULTI_TENANCY.md`](.ai/backend/MULTI_TENANCY.md)
 for the full model.
 
+## Custom Admin Branding (Not Yet Configured)
+
+The admin panel currently uses Payload's own default look — no custom design has been built
+yet. The hook points are already prepared for when it is:
+
+- **`src/components/branding/`** — where custom logo/icon components will live (see the
+  README in that folder).
+- **`admin.components.graphics`** and **`admin.meta`** in `src/payload.config.ts` — already
+  commented with the exact shape to wire in a custom logo, favicon, and page title suffix.
+- **`src/app/(payload)/custom.scss`** — global admin style overrides, already imported by the
+  admin layout; currently empty.
+
 ## Troubleshooting
 
 - **`pnpm dev` can't connect to the database** — see
