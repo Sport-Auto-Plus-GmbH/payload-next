@@ -137,6 +137,14 @@ pnpm exec tsx -r dotenv/config src/scripts/createSuperAdmin.ts you@example.com "
 Then log in at `/admin` with that email and password. This command is safe to run again
 later — it does nothing if an account with that email already exists.
 
+### Password Resets
+
+Self-service "Forgot password?" is turned off (its link is hidden on the login page, see
+`custom.scss`) — there's no email adapter configured, so a reset email would never actually
+reach anyone. Password resets are handled by IT instead: a super-admin opens the affected
+user's document (Users collection in the admin panel) and sets a new value directly in the
+Password field.
+
 ### Setting Up the Test Database
 
 Integration tests (`pnpm test:int`, `pnpm test:coverage`) run against their own database

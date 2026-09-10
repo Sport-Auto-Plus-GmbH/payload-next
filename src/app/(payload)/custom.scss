@@ -26,4 +26,12 @@
     --color: white;
     --hover-color: white;
   }
+
+  // Self-service password reset is turned off (no email adapter is configured — see
+  // README's "Password Resets" — so the emailed reset link wouldn't reach anyone anyway).
+  // Payload has no config flag to disable the "Forgot password?" link itself, so it's
+  // hidden here; the underlying /forgot route still technically exists, unlinked.
+  &__form > a {
+    display: none;
+  }
 }
