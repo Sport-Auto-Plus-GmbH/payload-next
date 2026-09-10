@@ -13,7 +13,7 @@ export default async function Logo({ payload }: ServerProps) {
     <img
       src={logoUrl || FALLBACK_LOGO_URL}
       alt="Sport Auto Plus"
-      style={{ height: '2.75rem', width: 'auto' }}
+      style={{ height: '5rem', width: 'auto' }}
     />
   )
 }
