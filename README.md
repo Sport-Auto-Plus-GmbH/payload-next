@@ -111,7 +111,7 @@ connection error, check Docker Desktop first:
    If this errors out, open Docker Desktop and wait until it says it's running.
 
 2. **Is a Postgres container actually up and listening on the port your `.env` expects**
-   (default `127.0.0.1:5432`)?
+   (default `localhost:5432`)?
 
    ```bash
    docker ps --filter "publish=5432"
