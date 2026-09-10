@@ -257,6 +257,21 @@ own tenant can create/update/delete it. Slugs are globally unique across all ten
 (not per-tenant) — see `ensureUniqueSlug.ts`'s comment if/when true multi-tenant page content
 needs each tenant to reuse slugs like "home" independently.
 
+### Saving a Page Updates the Website Immediately
+
+`hooks/revalidatePageAfterChange.ts` / `revalidatePageAfterDelete.ts` call the Website's
+`/api/revalidate` webhook (shared secret, see `REVALIDATE_SECRET` in `.env.example`) so a
+saved change shows up on the next request — the Website's own fetch cache
+(`next: { revalidate: 3600 }`) would otherwise only pick it up up to an hour later. Renaming
+a page's slug revalidates both the old and new slug, so the old URL doesn't keep serving
+stale content. If `REVALIDATE_SECRET` isn't configured, this is skipped with a logged
+warning — the save itself still succeeds either way (see `utilities/revalidateWebsiteTag.ts`;
+failures here never undo or fail the write that triggered them).
+
+Note this is **not** Payload Live Preview (an iframe showing draft, unpublished content while
+editing) — `Pages` has no `versions.drafts`, so every save is immediately live. There's no
+before-you-save preview yet.
+
 ### `heroTeaser` — the First Content Block
 
 `src/blocks/content/heroTeaser/` — a headline, subheadline, and description, each with its

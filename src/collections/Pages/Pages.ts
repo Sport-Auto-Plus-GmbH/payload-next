@@ -8,6 +8,8 @@ import { updateAccess } from '@/collections/shared/access/updateAccess'
 
 import { ensureUniqueSlug } from './hooks/ensureUniqueSlug'
 import { formatSlug } from './hooks/formatSlug'
+import { revalidatePageAfterChange } from './hooks/revalidatePageAfterChange'
+import { revalidatePageAfterDelete } from './hooks/revalidatePageAfterDelete'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -27,6 +29,8 @@ export const Pages: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [formatSlug, ensureUniqueSlug],
+    afterChange: [revalidatePageAfterChange],
+    afterDelete: [revalidatePageAfterDelete],
   },
   fields: [
     {
