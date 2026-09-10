@@ -91,6 +91,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faImage } from '@fortawesome/pro-regular-svg-icons'
 ```
 
-The private FontAwesome npm registry token is a per-developer credential — it lives in each
-developer's own global `~/.npmrc`, never in this repo's committed `.npmrc` (which only maps
-`@fortawesome` to FontAwesome's registry, not the secret itself). See `README.md`.
+The private FontAwesome npm registry token is a per-developer credential — it lives in the
+project-local `.npmrc` (gitignored, never committed). Copy `.npmrc.example` to `.npmrc` and
+fill in your own token; never put a real token in `.npmrc.example`. See `README.md`.

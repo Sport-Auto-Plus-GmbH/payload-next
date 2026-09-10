@@ -42,15 +42,14 @@ pnpm version: `^9 || ^10 || ^11`.
   [pnpm's install docs](https://pnpm.io/installation).
 - **Docker Desktop** — running locally, to provide the Postgres database. Check it's running
   with `docker info`; if that errors, open Docker Desktop and wait until it's ready.
-- **A FontAwesome Pro npm auth token** in your own global `~/.npmrc` (ask whoever manages the
-  license) — only needed if `pnpm install` fails to fetch the `@fortawesome/pro-*` packages:
+- **A FontAwesome Pro npm auth token**, needed to fetch the `@fortawesome/pro-*` packages:
 
-  ```
-  //npm.fontawesome.com/:_authToken=YOUR_TOKEN_HERE
+  ```bash
+  cp .npmrc.example .npmrc
   ```
 
-  Never put the token in this project's own `.npmrc` — that one is committed and only maps
-  `@fortawesome` to FontAwesome's registry, not the secret itself.
+  Then fill in your own token (ask whoever manages the license) in place of
+  `YOUR_FONTAWESOME_TOKEN_HERE`. `.npmrc` is gitignored — never commit it.
 
 ## Setting Up the Project (Step by Step)
 
