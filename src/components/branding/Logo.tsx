@@ -12,7 +12,7 @@ export default async function Logo({ payload }: ServerProps) {
     <div className="flex flex-col items-center gap-2">
       {/* eslint-disable-next-line @next/next/no-img-element -- tiny branding asset, not worth next/image's config for a single admin-only logo */}
       <img src={logoUrl || FALLBACK_LOGO_URL} alt="Sport Auto Plus" className="h-30 w-auto" />
-      <span className="text-sm tracking-wide text-[var(--theme-elevation-500)] uppercase">
+      <span className="text-xl tracking-wide text-[var(--theme-elevation-500)] uppercase">
         Payload CMS
       </span>
     </div>

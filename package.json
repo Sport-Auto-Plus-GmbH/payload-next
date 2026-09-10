@@ -19,9 +19,11 @@
     "migrate:status": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:status",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "test": "pnpm run test:int && pnpm run test:e2e",
+    "test": "pnpm run test:unit && pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
+    "test:unit": "cross-env NODE_OPTIONS=--no-deprecation vitest run tests/unit --config ./vitest.config.mts",
+    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run tests/int --config ./vitest.config.mts",
+    "test:coverage": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts --coverage",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -61,6 +63,7 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "4.5.2",
+    "@vitest/coverage-v8": "4.0.18",
     "eslint": "^9.16.0",
     "eslint-config-next": "16.3.3",
     "husky": "^9.1.7",

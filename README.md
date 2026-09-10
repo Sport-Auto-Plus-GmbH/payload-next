@@ -137,6 +137,20 @@ pnpm exec tsx -r dotenv/config src/scripts/createSuperAdmin.ts you@example.com "
 Then log in at `/admin` with that email and password. This command is safe to run again
 later — it does nothing if an account with that email already exists.
 
+### Setting Up the Test Database
+
+Integration tests (`pnpm test:int`, `pnpm test:coverage`) run against their own database
+(`.env.test`, already committed — no secrets in it), never the dev database in `.env`. One
+extra one-time step beyond the setup above: create that database and apply migrations to it.
+
+```bash
+docker exec -i <your-postgres-container> psql -U saplus_dev -d datendrehscheibe -c "CREATE DATABASE datendrehscheibe_test;"
+DATABASE_URL="postgres://saplus_dev:saplus_dev@localhost:5432/datendrehscheibe_test" DATABASE_SCHEMA=payload PAYLOAD_SECRET=test-secret-do-not-use-in-production pnpm migrate
+```
+
+Re-run the `pnpm migrate` line above (against `datendrehscheibe_test`) whenever a new
+migration is added, same as you would for the dev database.
+
 ## Everyday Commands
 
 | Command                     | What it does                                                                 |
@@ -149,8 +163,10 @@ later — it does nothing if an account with that email already exists.
 | `pnpm migrate:create`       | Create a new migration after a schema change (see `.ai/backend/DATABASE.md`) |
 | `pnpm migrate`              | Apply any pending migrations                                                 |
 | `pnpm migrate:status`       | Show which migrations have run                                               |
-| `pnpm test:int`             | Run the integration tests                                                    |
+| `pnpm test:unit`            | Run unit tests (no database needed)                                          |
+| `pnpm test:int`             | Run the integration tests (needs the test database — see below)              |
 | `pnpm test:e2e`             | Run the end-to-end (browser) tests                                           |
+| `pnpm test:coverage`        | Run unit + integration tests with coverage; fails under 80%                  |
 
 ## How the Project Is Organized
 
