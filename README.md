@@ -267,6 +267,8 @@ pnpm/Next.js stack (no deployment/workflow-shape changes):
   `pnpm test:coverage` (see "Coverage" in `.ai/quality/TESTING.md`). Runs on every PR. No
   separate linting job — Husky's pre-commit/pre-push hooks already enforce format/lint
   locally before anything reaches a PR.
+- **`release_actions.yml`** — manual deploy to any environment (`workflow_dispatch`,
+  matching `website-next`'s); the only caller of `c_build_and_deploy.yml` in this repo.
 - **`c_build_and_deploy.yml`** — the actual build+deploy: builds on the runner
   (`generate:types`, `generate:importmap`, `build`), **applies pending migrations against
   the target environment's database**, then builds and pushes the Docker image and deploys
@@ -279,12 +281,6 @@ DATABASE.md`'s "Deploy Safety" section for the migration-authoring rules that ma
   `CONTAINER_REGISTRY_*`, `AZURE_*`) plus two new ones this environment's database needs
   (`DATABASE_URL`, `PAYLOAD_SECRET`) — configured on this repo/its GitHub Environments, not
   something this repo can set up on its own.
-
-  `c_build_and_deploy.yml` is a reusable workflow (`on: workflow_call`) — nothing in this
-  repo currently calls it (the old repo's only caller, `pull_request_actions.yml`, was
-  removed; unlike `website-next`, the old `Payload` repo never had a `release_actions.yml`
-  either). It needs a new caller — a manual `workflow_dispatch` trigger, a PR-label trigger,
-  or whatever this project's actual release process should be — before it can run at all.
 
 The `Dockerfile` mirrors the old repo's pattern (builds once on the runner, the image just
 installs production dependencies and copies the pre-built `.next/standalone` output — not a
