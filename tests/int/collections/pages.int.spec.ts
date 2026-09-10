@@ -91,4 +91,30 @@ describe('pages collection', () => {
 
     expect(page.slug).toBe(`impressum-${runID}`)
   })
+
+  it('hides a draft from an unauthenticated request but not from an authenticated one', async () => {
+    const draft = await payload.create({
+      collection: 'pages',
+      data: { title: 'Draft Page', slug: `draft-page-${runID}`, tenant: tenantID },
+      draft: true,
+      overrideAccess: true,
+    })
+    createdPageIDs.push(draft.id)
+
+    const publicResult = await payload.find({
+      collection: 'pages',
+      where: { slug: { equals: `draft-page-${runID}` } },
+      overrideAccess: false,
+    })
+    expect(publicResult.docs).toHaveLength(0)
+
+    const authenticatedResult = await payload.find({
+      collection: 'pages',
+      where: { slug: { equals: `draft-page-${runID}` } },
+      overrideAccess: false,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- minimal fake user, only truthiness matters to the access check
+      user: superAdmin as any,
+    })
+    expect(authenticatedResult.docs).toHaveLength(1)
+  })
 })

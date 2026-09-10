@@ -128,6 +128,15 @@ The AI MUST NOT run `pnpm dev` / `next dev`. Tell the user if a restart is requi
 
 ---
 
+# Never Commit or Push Without Being Asked
+
+The AI MUST NOT run `git commit` or `git push` (or any equivalent) unless the user explicitly
+asks for it in that moment. Finishing a task, fixing a bug, or the user approving the
+implementation itself is not, on its own, permission to commit or push — wait for an explicit
+instruction to do so.
+
+---
+
 # Respect Manual Changes
 
 Files can change outside the AI's own edits — the user working directly in their editor,

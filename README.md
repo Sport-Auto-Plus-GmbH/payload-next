@@ -268,9 +268,21 @@ stale content. If `REVALIDATE_SECRET` isn't configured, this is skipped with a l
 warning — the save itself still succeeds either way (see `utilities/revalidateWebsiteTag.ts`;
 failures here never undo or fail the write that triggered them).
 
-Note this is **not** Payload Live Preview (an iframe showing draft, unpublished content while
-editing) — `Pages` has no `versions.drafts`, so every save is immediately live. There's no
-before-you-save preview yet.
+### Drafts and Live Preview
+
+`Pages` has `versions.drafts` enabled: saving now defaults to a draft, and editors explicitly
+click **Publish changes** to make it public. `access.read` (`Pages/access/readPublishedOrAuthenticated.ts`)
+scopes unauthenticated reads to `_status: 'published'` only — an authenticated request (the
+admin panel, Live Preview) can read drafts too. This is a real gap in Payload's own drafts
+feature (it does not filter published-only reads for you) — see that file's comment.
+
+The admin's **Live Preview** tab (`admin.livePreview` in `src/payload.config.ts`) renders the
+Website in a split-view iframe that updates as you type, before you save — resolved per-page
+via `utilities/resolvePageLivePreviewUrl.ts` (`home` → `/`, any other slug → `/<slug>`). This
+needs `cors`/`csrf` scoped to `FRONTEND_URL` (the Website's origin) so the Website's
+`useLivePreview` hook can fetch this CMS's REST API cross-origin, and `serverURL` set
+explicitly — see the comments next to `cors`/`csrf`/`serverURL` in `payload.config.ts` for why
+skipping `serverURL` breaks the admin's own requests once `cors`/`csrf` are scoped.
 
 ### `heroTeaser` — the First Content Block
 

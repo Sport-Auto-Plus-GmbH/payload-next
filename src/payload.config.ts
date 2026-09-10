@@ -13,31 +13,35 @@ import { Tenants } from './collections/Tenants/Tenants'
 import { Users } from './collections/Users'
 import { CorporateIdentity } from './globals/CorporateIdentity/CorporateIdentity'
 import type { Config } from './payload-types'
+import { resolvePageLivePreviewUrl } from './utilities/resolvePageLivePreviewUrl'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3001'
+const SERVER_URL = process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
 export default buildConfig({
+  // Payload's own public origin. Without this set explicitly, adding `cors`/`csrf` below
+  // makes Payload require the request's own Host header to also be in the allowlist (see
+  // getRequestOrigin's warning) — the admin UI's own same-origin requests would otherwise
+  // start failing once cors/csrf are scoped to the Website's origin only.
+  serverURL: SERVER_URL,
   admin: {
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    // Pages exists now, but without `versions.drafts` (not asked for yet), so it isn't
-    // added here — Payload only shows the Live Preview tab for collections listed here,
-    // and Live Preview only makes sense once there's a draft state to preview. Once
-    // Pages gets `versions: { drafts: true }`, add its slug here and change the URL
-    // below to resolve the actual document's public path instead of the bare origin
-    // (see .ai/cms/GLOBALS.md's Live Preview section).
     livePreview: {
-      collections: [],
+      collections: [Pages.slug],
       breakpoints: [
         { label: 'Desktop', name: 'desktop', width: 1440, height: 1080 },
         { label: 'Mobile', name: 'mobile', width: 375, height: 667 },
       ],
-      url: async () => FRONTEND_URL,
+      // Only Pages is previewable right now, so `data.slug` always resolves via
+      // resolvePageLivePreviewUrl. A second previewable collection with a different
+      // URL shape would need to branch on `collectionConfig.slug` here.
+      url: ({ data }) => resolvePageLivePreviewUrl(FRONTEND_URL, data?.slug),
     },
     components: {
       graphics: {
@@ -56,6 +60,12 @@ export default buildConfig({
   globals: [CorporateIdentity],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
+  // Scoped to the Website's own origin(s) only — see .ai/backend/REST_API.md's "CORS and
+  // CSRF". Needed for Live Preview: useLivePreview fetches the full document cross-origin
+  // (localhost:3001 -> localhost:3000) to populate relationships beyond the postMessage
+  // payload.
+  cors: [FRONTEND_URL],
+  csrf: [FRONTEND_URL],
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
