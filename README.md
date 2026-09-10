@@ -169,6 +169,16 @@ are assigned to, a role of `tenant-admin` (full access to that tenant's content)
 `tenant-viewer` (read-only). See [`.ai/backend/MULTI_TENANCY.md`](.ai/backend/MULTI_TENANCY.md)
 for the full model.
 
+## Related Systems
+
+The public website (`website-next`) doesn't only consume this CMS — it also reads live data
+(e.g. vehicle inventory/pricing) directly from a third system, the **Datendrehscheibe**, over
+its own OpenAPI-described HTTP API. This project has no direct involvement in that
+integration; it's documented in `website-next`'s
+[`.ai/backend/DATENDREHSCHEIBE_CLIENT.md`](https://github.com/Sport-Auto-Plus-GmbH/website-next/blob/main/.ai/backend/DATENDREHSCHEIBE_CLIENT.md)
+and in the Datendrehscheibe's own README, purely for orientation if you're new to how the
+three projects fit together.
+
 ## Custom Admin Branding (Not Yet Configured)
 
 The admin panel currently uses Payload's own default look — no custom design has been built
