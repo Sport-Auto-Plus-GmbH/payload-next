@@ -34,6 +34,10 @@ on:
         required: true
       AZURE_APP_SERVICE_ID:
         required: true
+      DATABASE_URL:
+        required: true
+      PAYLOAD_SECRET:
+        required: true
 
 permissions:
   contents: read
@@ -73,6 +77,25 @@ jobs:
           pnpm generate:types
           pnpm generate:importmap
           pnpm build
+
+      # Runs BEFORE the image is built/deployed, so if a migration fails, nothing about the
+      # currently-running app changes — the job just stops here. See
+      # .ai/backend/DATABASE.md's "Deploy Safety" section for the authoring rules (additive/
+      # backward-compatible migrations) that make this safe in the first place; this step
+      # only catches "does it apply cleanly against the real environment," not "is it
+      # compatible with the code still running while it applies." Payload itself has no
+      # general-purpose "confirm before destructive DDL" gate — it only ever prompts when
+      # this environment was previously modified via PAYLOAD_DB_PUSH dev-mode schema push
+      # (batch -1 in the migrations table), and even then answers "no" on a closed/non-TTY
+      # stdin and exits 0 — meaning this step would silently do nothing rather than fail.
+      # Never run a schema push against this environment (already the rule in
+      # .ai/backend/DATABASE.md) and this can't happen.
+      - name: Apply database migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_SCHEMA: payload
+          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
+        run: pnpm migrate
 
       - name: Build Docker image
         env:

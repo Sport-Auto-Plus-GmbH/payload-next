@@ -151,6 +151,12 @@ corresponding migration generated via `pnpm migrate:create`. The AI MUST NOT han
 already-applied migration file, and MUST NOT delete or reorder existing files in
 `src/migrations/`.
 
+A schema-breaking change (a rename, a new required field, dropping a field/collection) MUST
+be split into additive, backward-compatible steps (expand → backfill → migrate code →
+contract) rather than one migration that only works if the old code stops running at
+exactly the same instant the new schema takes effect. → See `backend/DATABASE.md`'s "Deploy
+Safety" section — this is the single most consequential rule in that document.
+
 → See `backend/DATABASE.md`.
 
 ---

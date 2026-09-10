@@ -271,11 +271,17 @@ pnpm/Next.js stack (no deployment/workflow-shape changes):
   when the PR carries a `deploy` label (add it manually when you want a live preview of that
   PR; most PRs don't need one).
 - **`c_build_and_deploy.yml`** — the actual build+deploy: builds on the runner
-  (`generate:types`, `generate:importmap`, `build`), then builds and pushes the Docker image
-  and deploys it to Azure App Service via the shared
-  `Sport-Auto-Plus-GmbH/infrastructure` action. Requires the same secrets as the old repo
-  (`FONTAWESOME_TOKEN`, `CONTAINER_REGISTRY_*`, `AZURE_*`) configured on this repo/its GitHub
-  Environments — not something this repo can set up on its own.
+  (`generate:types`, `generate:importmap`, `build`), **applies pending migrations against
+  the target environment's database**, then builds and pushes the Docker image and deploys
+  it to Azure App Service via the shared `Sport-Auto-Plus-GmbH/infrastructure` action.
+  Migrations run as their own step _before_ the image is built/deployed — if they fail, the
+  job stops there and the currently-running app is never touched (see `.ai/backend/
+DATABASE.md`'s "Deploy Safety" section for the migration-authoring rules that make this
+  safe, and why a migration is required to be backward-compatible on its own, not just
+  "applies without error"). Requires the same secrets as the old repo (`FONTAWESOME_TOKEN`,
+  `CONTAINER_REGISTRY_*`, `AZURE_*`) plus two new ones this environment's database needs
+  (`DATABASE_URL`, `PAYLOAD_SECRET`) — configured on this repo/its GitHub Environments, not
+  something this repo can set up on its own.
 
 The `Dockerfile` mirrors the old repo's pattern (builds once on the runner, the image just
 installs production dependencies and copies the pre-built `.next/standalone` output — not a
