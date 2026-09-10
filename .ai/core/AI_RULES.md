@@ -59,11 +59,16 @@ only consumes this project's REST API.
 
 The AI MUST NOT:
 
-- add Website-specific rendering logic (Tailwind/shadcn components, Zustand stores) to this
-  repository
+- add Website-specific rendering logic (shadcn/ui components, Zustand stores, public pages)
+  to this repository
 - assume knowledge of the Website's internal folder structure or components
 - design a collection/field/API shape around one specific frontend rendering detail instead
   of around the actual content model
+
+Tailwind CSS utility classes ARE available here, but only to style this project's own custom
+admin panel components (`components/`) instead of inline styles — see
+`cms/ADMIN_COMPONENTS.md`. That's a different thing from what's forbidden above: it never
+renders a public page and isn't the Website's Tailwind setup.
 
 → See `core/PROJECT_ARCHITECTURE.md` and `backend/REST_API.md`.
 

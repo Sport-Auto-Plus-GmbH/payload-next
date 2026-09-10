@@ -76,6 +76,43 @@ primitives (`@payloadcms/ui`) over hand-rolled form controls to inherit this for
 
 ---
 
+# Styling: Tailwind Utilities, No Inline Styles
+
+Custom admin components MUST use Tailwind CSS utility classes instead of inline `style={{}}`
+props or new hand-written CSS. Tailwind is set up specifically for this — utilities and theme
+tokens only, no preflight:
+
+```
+src/app/(payload)/tailwind.css   the actual `@import 'tailwindcss/theme.css'` /
+                                 `@import 'tailwindcss/utilities.css'` — a plain .css file
+src/app/(payload)/custom.scss    references it via `@import './tailwind.css'`
+postcss.config.mjs               `@tailwindcss/postcss`
+```
+
+Two non-obvious constraints if you ever touch this setup:
+
+- **No preflight, on purpose.** Preflight resets margins, headings, buttons, lists, etc.
+  globally — that would fight Payload's own admin panel styling everywhere, not just inside
+  our components. Only import `tailwindcss/theme.css` + `tailwindcss/utilities.css`, never
+  the bundled `tailwindcss/index.css` (which includes preflight).
+- **The Tailwind imports must live in a plain `.css` file, not directly in `custom.scss`.**
+  Sass processes `.scss` content itself, and it can't resolve Tailwind's own `@import`
+  shorthand — worse, if the Tailwind imports sit directly inside Sass source, Tailwind's
+  PostCSS plugin never sees them as a genuine top-level CSS entry, so it silently fails to
+  expand `@theme` into real CSS custom properties (utilities like `uppercase` or arbitrary
+  values like `text-[var(--x)]` still render, since those don't need a theme lookup, but
+  everything on the `--spacing` scale — `gap-2`, `h-30`, `tracking-wide`, `p-4`, ... —
+  silently no-ops). Keep Tailwind's own imports in `tailwind.css` (a real `.css` file), and
+  reference that from `custom.scss` with a relative path (`./tailwind.css`, not bare
+  `tailwind.css` — Tailwind's PostCSS plugin resolves that import itself and only checks
+  `node_modules` for a bare specifier).
+
+This is a completely separate Tailwind setup from the Website's (`website-next`) — different
+config, different repo, no shared build. See `core/AI_RULES.md`'s "This Is a Headless CMS"
+section for the boundary between the two.
+
+---
+
 # Icons (FontAwesome Pro+)
 
 FontAwesome Pro+ (`@fortawesome/fontawesome-svg-core`, `@fortawesome/react-fontawesome`, and

@@ -14,23 +14,24 @@ this project follows.
 
 ## Tech Stack
 
-| Purpose           | Technology                                           | Version |
-| ----------------- | ---------------------------------------------------- | ------- |
-| Framework         | [Next.js](https://nextjs.org/)                       | 16.3.3  |
-| CMS               | [Payload](https://payloadcms.com/)                   | 3.88.0  |
-| UI library        | [React](https://react.dev/)                          | 19.2.6  |
-| Language          | [TypeScript](https://www.typescriptlang.org/)        | 5.7.3   |
-| Database          | [PostgreSQL](https://www.postgresql.org/)            | 17      |
-| DB adapter        | `@payloadcms/db-postgres`                            | 3.88.0  |
-| Multi-tenancy     | `@payloadcms/plugin-multi-tenant`                    | 3.88.0  |
-| Rich text editor  | `@payloadcms/richtext-lexical`                       | 3.88.0  |
-| Image processing  | [sharp](https://sharp.pixelplumbing.com/)            | 0.34.2  |
-| Icons             | FontAwesome Pro+ (licensed)                          | 7.x     |
-| Package manager   | [pnpm](https://pnpm.io/)                             | 10.x    |
-| Linting           | [ESLint](https://eslint.org/) (`eslint-config-next`) | 9.x     |
-| Formatting        | [Prettier](https://prettier.io/)                     | 3.x     |
-| Integration tests | [Vitest](https://vitest.dev/)                        | 4.0.18  |
-| End-to-end tests  | [Playwright](https://playwright.dev/)                | 1.58.2  |
+| Purpose           | Technology                                                                              | Version |
+| ----------------- | --------------------------------------------------------------------------------------- | ------- |
+| Framework         | [Next.js](https://nextjs.org/)                                                          | 16.3.3  |
+| CMS               | [Payload](https://payloadcms.com/)                                                      | 3.88.0  |
+| UI library        | [React](https://react.dev/)                                                             | 19.2.6  |
+| Language          | [TypeScript](https://www.typescriptlang.org/)                                           | 5.7.3   |
+| Database          | [PostgreSQL](https://www.postgresql.org/)                                               | 17      |
+| DB adapter        | `@payloadcms/db-postgres`                                                               | 3.88.0  |
+| Multi-tenancy     | `@payloadcms/plugin-multi-tenant`                                                       | 3.88.0  |
+| Rich text editor  | `@payloadcms/richtext-lexical`                                                          | 3.88.0  |
+| Image processing  | [sharp](https://sharp.pixelplumbing.com/)                                               | 0.34.2  |
+| Icons             | FontAwesome Pro+ (licensed)                                                             | 7.x     |
+| Styling (admin)   | [Tailwind CSS](https://tailwindcss.com/) (utilities-only, custom admin components only) | 4.x     |
+| Package manager   | [pnpm](https://pnpm.io/)                                                                | 10.x    |
+| Linting           | [ESLint](https://eslint.org/) (`eslint-config-next`)                                    | 9.x     |
+| Formatting        | [Prettier](https://prettier.io/)                                                        | 3.x     |
+| Integration tests | [Vitest](https://vitest.dev/)                                                           | 4.0.18  |
+| End-to-end tests  | [Playwright](https://playwright.dev/)                                                   | 1.58.2  |
 
 Required Node.js version: `^18.20.2 || >=20.9.0` (developed and tested on Node 24). Required
 pnpm version: `^9 || ^10 || ^11`.
@@ -222,6 +223,16 @@ Payload's neutral default theme:
   orange. Static (matches the CorporateIdentity global's default hex), not read live from the
   CMS — see the comment there for why.
 - A collapsed-nav **Icon** hasn't been added yet — needs a square version of the mark first.
+
+### Styling Custom Admin Components with Tailwind
+
+Custom admin components (`components/`, e.g. `Logo.tsx`) use Tailwind CSS utility classes
+instead of inline styles — see [`.ai/cms/ADMIN_COMPONENTS.md`](.ai/cms/ADMIN_COMPONENTS.md)
+for the rule and setup details (`src/app/(payload)/tailwind.css`,
+`src/app/(payload)/custom.scss`). It's utilities-only: Tailwind's preflight reset is
+deliberately excluded so it doesn't fight Payload's own admin panel styling everywhere else.
+This is scoped to the admin panel only — it has nothing to do with, and doesn't replace, the
+Website's own separate Tailwind setup.
 
 ## Troubleshooting
 

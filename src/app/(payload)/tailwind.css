@@ -1,0 +1,8 @@
+/* Tailwind entry for custom admin components (components/) — utilities + theme tokens only,
+   no preflight (see custom.scss for why). Kept as a plain .css file and referenced from
+   custom.scss via a plain CSS @import, rather than importing these directly from the .scss
+   source: Tailwind's PostCSS plugin needs to process this file as a genuine top-level entry
+   to expand its @theme block into real CSS custom properties — nesting it inside Sass's own
+   @import resolution doesn't work reliably. */
+@import 'tailwindcss/theme.css';
+@import 'tailwindcss/utilities.css';

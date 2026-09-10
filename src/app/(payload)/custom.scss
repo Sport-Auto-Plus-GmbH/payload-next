@@ -1,6 +1,17 @@
 // Global admin panel style overrides. Already imported by ./layout.tsx, so anything
 // added here takes effect immediately.
 //
+// Tailwind CSS utilities are available for custom admin components (components/), so
+// they don't need inline styles — see .ai/cms/ADMIN_COMPONENTS.md. The actual Tailwind
+// imports live in ./tailwind.css (theme + utilities only, no preflight — preflight resets
+// margins, headings, buttons, lists etc. globally, which would fight Payload's own admin
+// styling everywhere, not just inside our custom components), referenced here as a plain
+// CSS `@import` (`.css` extension, so Sass passes it through unprocessed instead of trying
+// to resolve it itself) — Tailwind's PostCSS plugin needs to see it as a genuine top-level
+// CSS entry to expand its `@theme` block into real custom properties, which doesn't happen
+// reliably when the Tailwind imports themselves sit directly inside .scss source.
+@import './tailwind.css';
+//
 // The rest of the admin panel intentionally stays on Payload's own neutral theme —
 // only the login page gets the Sport Auto Plus brand color, on its primary button.
 // These hex values match the corporate-identity global's defaults
