@@ -8,6 +8,7 @@ import sharp from 'sharp'
 
 import { isSuperAdmin } from './access/isSuperAdmin'
 import { Media } from './collections/Media/Media'
+import { Pages } from './collections/Pages/Pages'
 import { Tenants } from './collections/Tenants/Tenants'
 import { Users } from './collections/Users'
 import { CorporateIdentity } from './globals/CorporateIdentity/CorporateIdentity'
@@ -24,13 +25,12 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    // No page-like (draft/versioned) collection exists yet, so `collections` stays
-    // empty — Payload only shows the Live Preview tab for collections listed here.
-    // Once one exists (e.g. a future Pages collection with `versions.drafts`), add
-    // its slug and adjust the URL below to resolve that document's actual public
-    // path (see .ai/cms/GLOBALS.md's Live Preview section and
-    // src/app/(frontend) in the old project for the previous slug-resolution
-    // approach, if useful as a reference).
+    // Pages exists now, but without `versions.drafts` (not asked for yet), so it isn't
+    // added here — Payload only shows the Live Preview tab for collections listed here,
+    // and Live Preview only makes sense once there's a draft state to preview. Once
+    // Pages gets `versions: { drafts: true }`, add its slug here and change the URL
+    // below to resolve the actual document's public path instead of the bare origin
+    // (see .ai/cms/GLOBALS.md's Live Preview section).
     livePreview: {
       collections: [],
       breakpoints: [
@@ -52,7 +52,7 @@ export default buildConfig({
     // generator. A custom Icon (collapsed nav mark) can be added the same way as
     // Logo above once a square version of the mark exists.
   },
-  collections: [Tenants, Users, Media],
+  collections: [Tenants, Users, Media, Pages],
   globals: [CorporateIdentity],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
@@ -73,6 +73,7 @@ export default buildConfig({
       collections: {
         // Every tenant-scoped collection is registered here as it is created.
         media: {},
+        pages: {},
       },
       tenantsArrayField: {
         rowFields: [

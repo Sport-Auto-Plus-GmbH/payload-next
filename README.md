@@ -179,7 +179,11 @@ migration is added, same as you would for the dev database.
 ## How the Project Is Organized
 
 - **`src/collections/`** — the content types Payload manages. Right now: `Tenants` (each
-  dealer/brand), `Users` (admin accounts), `Media` (uploaded files).
+  dealer/brand), `Users` (admin accounts), `Media` (uploaded files), `Pages` (website pages
+  built from content blocks — see below).
+- **`src/blocks/content/`** — reusable content blocks editors add to a `Pages` document's
+  `layout` field. Currently: `heroTeaser` (headline/subheadline/description, each with its
+  own editable text, font size, and color).
 - **`src/migrations/`** — the history of database schema changes, applied in order.
 - **`src/scripts/`** — small one-off scripts you run by hand, like creating the first admin.
 - **`src/payload.config.ts`** — the central configuration file wiring everything together.
@@ -233,6 +237,36 @@ an SVG upload, check that the file doesn't have a `<!DOCTYPE svg ...>` declarati
 built-in SVG detection doesn't strip that before checking for the `<svg>` root tag, and
 misclassifies it as generic XML (common in Adobe Illustrator exports; safe to remove, it has
 no effect on rendering).
+
+## Pages & Content Blocks
+
+The `Pages` collection (`src/collections/Pages/`) is what editors use to build website
+pages out of content blocks — a `title`, a `slug` (auto-generated from the title if left
+empty, uniquified with a `-2`/`-3`/... suffix rather than rejecting the save — see
+`hooks/formatSlug.ts` and `hooks/ensureUniqueSlug.ts`), and a `layout` field where editors
+add one or more blocks from `src/blocks/content/`.
+
+**The page with slug `home` is the website's homepage** — `website-next` fetches it
+specifically by that slug (see its own README). There's currently no dedicated "is this the
+homepage" flag; renaming or deleting the `home`-slugged page changes what the Website shows
+at `/`.
+
+Tenant-scoped and publicly readable, matching `Media`'s existing pattern — anyone can read
+via the REST API without authentication, but only a super-admin or a member of the page's
+own tenant can create/update/delete it. Slugs are globally unique across all tenants for now
+(not per-tenant) — see `ensureUniqueSlug.ts`'s comment if/when true multi-tenant page content
+needs each tenant to reuse slugs like "home" independently.
+
+### `heroTeaser` — the First Content Block
+
+`src/blocks/content/heroTeaser/` — a headline, subheadline, and description, each with its
+own editable text, font size (a fixed preset scale: Klein/Normal/Groß/Sehr groß/Riesig), and
+color (plain hex text field, same "start simple" approach as `CorporateIdentity`'s colors —
+see `styledTextField.ts`, reused three times within this block rather than repeated inline).
+
+Adding a second content block: create `src/blocks/content/<name>/<name>.ts`, add it to
+`src/blocks/content/index.ts`'s `contentBlocks` array, run `pnpm migrate:create` (a new block
+adds new tables), and `pnpm generate:types`. See `.ai/cms/BLOCKS.md`.
 
 ## Custom Admin Branding
 
