@@ -387,7 +387,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface CorporateIdentity {
   id: number;
   /**
-   * Horizontal logo on a light background. Falls back to the static default in website-next/public/cd/logo if empty.
+   * Horizontal logo on a light background. Falls back to the static default in public/cd/logo (both here and in website-next) if empty.
    */
   logo?: (number | null) | Media;
   /**

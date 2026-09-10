@@ -18,7 +18,8 @@ export const CorporateIdentity: GlobalConfig = {
       label: 'Logo',
       admin: {
         description:
-          'Horizontal logo on a light background. Falls back to the static default in website-next/public/cd/logo if empty.',
+          'Horizontal logo on a light background. Falls back to the static default in ' +
+          'public/cd/logo (both here and in website-next) if empty.',
       },
     },
     {

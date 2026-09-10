@@ -39,23 +39,18 @@ export default buildConfig({
       ],
       url: async () => FRONTEND_URL,
     },
-    // Custom admin branding is not configured yet — using Payload's defaults for
-    // now. When a real design is ready, wire it in here rather than inventing a
-    // different mechanism (see src/components/branding/README.md):
-    //
-    // components: {
-    //   graphics: {
-    //     Logo: '@/components/branding/Logo',
-    //     Icon: '@/components/branding/Icon',
-    //   },
-    // },
-    // meta: {
-    //   titleSuffix: '- Sport Auto Plus',
-    //   icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/favicon.svg' }],
-    // },
-    //
-    // Global style overrides go in src/app/(payload)/custom.scss, already wired
-    // into the admin layout by the generator.
+    components: {
+      graphics: {
+        Logo: '@/components/branding/Logo.tsx#default',
+      },
+    },
+    meta: {
+      titleSuffix: '- Sport Auto Plus',
+    },
+    // Global style overrides (e.g. the login page's brand-colored button) go in
+    // src/app/(payload)/custom.scss, already wired into the admin layout by the
+    // generator. A custom Icon (collapsed nav mark) can be added the same way as
+    // Logo above once a square version of the mark exists.
   },
   collections: [Tenants, Users, Media],
   globals: [CorporateIdentity],

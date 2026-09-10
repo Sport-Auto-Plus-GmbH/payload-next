@@ -209,17 +209,19 @@ built-in SVG detection doesn't strip that before checking for the `<svg>` root t
 misclassifies it as generic XML (common in Adobe Illustrator exports; safe to remove, it has
 no effect on rendering).
 
-## Custom Admin Branding (Not Yet Configured)
+## Custom Admin Branding
 
-The admin panel currently uses Payload's own default look — no custom design has been built
-yet. The hook points are already prepared for when it is:
+The login page uses the real Sport Auto Plus branding; the rest of the admin panel stays on
+Payload's neutral default theme:
 
-- **`src/components/branding/`** — where custom logo/icon components will live (see the
-  README in that folder).
-- **`admin.components.graphics`** and **`admin.meta`** in `src/payload.config.ts` — already
-  commented with the exact shape to wire in a custom logo, favicon, and page title suffix.
-- **`src/app/(payload)/custom.scss`** — global admin style overrides, already imported by the
-  admin layout; currently empty.
+- **`src/components/branding/Logo.tsx`** — replaces the login page's logo, wired via
+  `admin.components.graphics.Logo` in `src/payload.config.ts`. Reads the logo straight from
+  the `corporate-identity` global (see "Corporate Identity" above), falling back to the
+  static `public/cd/logo/sport-auto-plus-logo.svg` if none is set.
+- **`src/app/(payload)/custom.scss`** — gives the login page's submit button the brand
+  orange. Static (matches the CorporateIdentity global's default hex), not read live from the
+  CMS — see the comment there for why.
+- A collapsed-nav **Icon** hasn't been added yet — needs a square version of the mark first.
 
 ## Troubleshooting
 

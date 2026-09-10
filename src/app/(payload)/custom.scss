@@ -1,3 +1,18 @@
-// Global admin panel style overrides go here. Empty for now — the admin panel
-// uses Payload's default styling until a custom design is ready. Already
-// imported by ./layout.tsx, so anything added here takes effect immediately.
+// Global admin panel style overrides. Already imported by ./layout.tsx, so anything
+// added here takes effect immediately.
+//
+// The rest of the admin panel intentionally stays on Payload's own neutral theme —
+// only the login page gets the Sport Auto Plus brand color, on its primary button.
+// These hex values match the corporate-identity global's defaults
+// (src/globals/CorporateIdentity/CorporateIdentity.ts); they're static here rather
+// than reading the live CMS value, since doing that would need a beforeLogin
+// component injecting a <style> tag — not worth it unless the login page needs to
+// reflect an edited color before the next deploy.
+.login {
+  .btn--style-primary {
+    --bg-color: #e94e1d;
+    --hover-bg: #c8410c;
+    --color: white;
+    --hover-color: white;
+  }
+}
