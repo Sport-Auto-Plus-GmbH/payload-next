@@ -9,11 +9,23 @@ export default async function Logo({ payload }: ServerProps) {
   const logoUrl = logo && typeof logo === 'object' ? logo.url : null
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- tiny branding asset, not worth next/image's config for a single admin-only logo
-    <img
-      src={logoUrl || FALLBACK_LOGO_URL}
-      alt="Sport Auto Plus"
-      style={{ height: '5rem', width: 'auto' }}
-    />
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- tiny branding asset, not worth next/image's config for a single admin-only logo */}
+      <img
+        src={logoUrl || FALLBACK_LOGO_URL}
+        alt="Sport Auto Plus"
+        style={{ height: '7.5rem', width: 'auto' }}
+      />
+      <span
+        style={{
+          fontSize: '0.8125rem',
+          letterSpacing: '0.05em',
+          textTransform: 'uppercase',
+          color: 'var(--theme-elevation-500)',
+        }}
+      >
+        Payload CMS
+      </span>
+    </div>
   )
 }
