@@ -15,11 +15,28 @@ import type { Config } from './payload-types'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3001'
+
 export default buildConfig({
   admin: {
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+    // No page-like (draft/versioned) collection exists yet, so `collections` stays
+    // empty — Payload only shows the Live Preview tab for collections listed here.
+    // Once one exists (e.g. a future Pages collection with `versions.drafts`), add
+    // its slug and adjust the URL below to resolve that document's actual public
+    // path (see .ai/cms/GLOBALS.md's Live Preview section and
+    // src/app/(frontend) in the old project for the previous slug-resolution
+    // approach, if useful as a reference).
+    livePreview: {
+      collections: [],
+      breakpoints: [
+        { label: 'Desktop', name: 'desktop', width: 1440, height: 1080 },
+        { label: 'Mobile', name: 'mobile', width: 375, height: 667 },
+      ],
+      url: async () => FRONTEND_URL,
     },
     // Custom admin branding is not configured yet — using Payload's defaults for
     // now. When a real design is ready, wire it in here rather than inventing a
