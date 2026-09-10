@@ -73,3 +73,24 @@ credentials client-side.
 Custom admin components are used daily by real editors — apply the same baseline as any UI:
 keyboard operability, visible focus, labeled controls. Prefer building on Payload's own UI
 primitives (`@payloadcms/ui`) over hand-rolled form controls to inherit this for free.
+
+---
+
+# Icons (FontAwesome Pro+)
+
+FontAwesome Pro+ (`@fortawesome/fontawesome-svg-core`, `@fortawesome/react-fontawesome`, and
+the `pro-regular`/`pro-solid`/`pro-duotone` icon packages) is installed for use inside custom
+admin components — an icon picker field, a themed row-label, branding assets under
+`components/branding/`. It is the only icon system in this project; do not add another icon
+library alongside it.
+
+Import individual icons, never a whole style package:
+
+```ts
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faImage } from '@fortawesome/pro-regular-svg-icons'
+```
+
+The private FontAwesome npm registry token is a per-developer credential — it lives in each
+developer's own global `~/.npmrc`, never in this repo's committed `.npmrc` (which only maps
+`@fortawesome` to FontAwesome's registry, not the secret itself). See `README.md`.

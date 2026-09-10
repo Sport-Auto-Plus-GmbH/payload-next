@@ -25,6 +25,7 @@ this project follows.
 | Multi-tenancy     | `@payloadcms/plugin-multi-tenant`                    | 3.88.0  |
 | Rich text editor  | `@payloadcms/richtext-lexical`                       | 3.88.0  |
 | Image processing  | [sharp](https://sharp.pixelplumbing.com/)            | 0.34.2  |
+| Icons             | FontAwesome Pro+ (licensed)                          | 7.x     |
 | Package manager   | [pnpm](https://pnpm.io/)                             | 10.x    |
 | Linting           | [ESLint](https://eslint.org/) (`eslint-config-next`) | 9.x     |
 | Formatting        | [Prettier](https://prettier.io/)                     | 3.x     |
@@ -41,6 +42,15 @@ pnpm version: `^9 || ^10 || ^11`.
   [pnpm's install docs](https://pnpm.io/installation).
 - **Docker Desktop** — running locally, to provide the Postgres database. Check it's running
   with `docker info`; if that errors, open Docker Desktop and wait until it's ready.
+- **A FontAwesome Pro npm auth token** in your own global `~/.npmrc` (ask whoever manages the
+  license) — only needed if `pnpm install` fails to fetch the `@fortawesome/pro-*` packages:
+
+  ```
+  //npm.fontawesome.com/:_authToken=YOUR_TOKEN_HERE
+  ```
+
+  Never put the token in this project's own `.npmrc` — that one is committed and only maps
+  `@fortawesome` to FontAwesome's registry, not the secret itself.
 
 ## Setting Up the Project (Step by Step)
 
