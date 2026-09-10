@@ -128,6 +128,18 @@ The AI MUST NOT run `pnpm dev` / `next dev`. Tell the user if a restart is requi
 
 ---
 
+# Respect Manual Changes
+
+Files can change outside the AI's own edits — the user working directly in their editor,
+another tool, a teammate. Before editing a file, its current on-disk content is
+authoritative, not whatever the AI last wrote or remembers writing in this conversation.
+
+The AI MUST NOT silently revert a manual change back to a version it generated earlier, and
+MUST NOT assume a file still matches what it produced before. If a file changed unexpectedly
+and the change looks like a mistake, ask before "fixing" it back — don't just overwrite it.
+
+---
+
 # Never Hand-Edit Applied Migrations
 
 Migrations in `src/migrations/` are generated and, once applied to any shared environment,
