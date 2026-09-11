@@ -295,6 +295,33 @@ Adding a second content block: create `src/blocks/content/<name>/<name>.ts`, add
 `src/blocks/content/index.ts`'s `contentBlocks` array, run `pnpm migrate:create` (a new block
 adds new tables), and `pnpm generate:types`. See `.ai/cms/BLOCKS.md`.
 
+## SEO & Redirects
+
+Two official Payload plugins from `.ai/cms/PLUGINS.md`'s chosen stack, ported over from the
+old (Angular) Payload project:
+
+- **`@payloadcms/plugin-seo`** (`src/payload.config.ts`, glue in `src/plugins/seo/`) adds a
+  `meta` group (title/description/image) to `pages`. `generateTitle` suggests the meta title
+  from the page's own `title` when an editor clicks "Auto-generate" — there's no
+  `generateDescription` yet, since Pages has no generic description-like field (content lives
+  in per-block fields like `heroTeaser`'s `description`); add one once such a field exists.
+- **`@payloadcms/plugin-redirects`** (glue in `src/plugins/redirects/`) adds a `redirects`
+  collection (`from` → `to`, either an internal `pages` reference or a custom URL). Unlike the
+  old project — which left it deliberately global/non-tenant-scoped — it's **tenant-scoped
+  here**, registered in `multiTenantPlugin` and using the same `shared/access` functions as
+  `Pages`, so each tenant manages only its own redirects. `revalidateRedirectsAfterChange`/
+  `AfterDelete` (`src/plugins/redirects/`) notify the Website's revalidation webhook with a
+  `redirects` tag on every change, same pattern as `Pages`.
+
+Note `redirectsPlugin` must be registered **before** `multiTenantPlugin` in the `plugins`
+array — it's what adds the `redirects` collection to the config in the first place, and
+plugins apply in array order (see the comment in `payload.config.ts`). Also note the
+plugin's default `from` field is globally unique across all tenants, not per-tenant — same
+known tradeoff as `Pages`' slug (see `ensureUniqueSlug.ts`'s comment).
+
+The Website consumes `redirects` via its own `src/proxy.ts` — see website-next's README
+("Redirects").
+
 ## Custom Admin Branding
 
 The login page uses the real Sport Auto Plus branding; the rest of the admin panel stays on
