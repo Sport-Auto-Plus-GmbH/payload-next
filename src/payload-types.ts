@@ -193,6 +193,15 @@ export interface Media {
   id: number;
   tenant?: (number | null) | Tenant;
   alt: string;
+  sourceType: 'upload' | 'youtube';
+  /**
+   * Akzeptiert youtube.com-, youtu.be- und YouTube-Shorts-Links.
+   */
+  youtubeUrl?: string | null;
+  /**
+   * Optionales Poster für Video-Player. Im Video-Teaser ist das Teaserbild maßgeblich.
+   */
+  videoThumbnail?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -269,6 +278,63 @@ export interface Page {
             id?: string | null;
             blockName?: string | null;
             blockType: 'vehicleListing';
+          }
+        | {
+            headline: {
+              text: string;
+              tag?: ('h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') | null;
+              color?: string | null;
+              /**
+               * CSS-Wert, z. B. 2rem oder clamp(1.8rem, 4.5vw, 4.4rem).
+               */
+              fontSize?: string | null;
+            };
+            subheadline?: {
+              text?: string | null;
+              tag?: ('h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') | null;
+              color?: string | null;
+              /**
+               * CSS-Wert, z. B. 2rem oder clamp(1.8rem, 4.5vw, 4.4rem).
+               */
+              fontSize?: string | null;
+            };
+            /**
+             * Optionales Label im Play-Button, z. B. 00:30.
+             */
+            durationLabel?: string | null;
+            teaserMedia: number | Media;
+            /**
+             * Lokaler Video-Upload oder ein Medium mit hinterlegter YouTube-URL.
+             */
+            videoMedia: number | Media;
+            /**
+             * Leere Werte übernehmen die zentralen Video-Teaser-Werte der CI.
+             */
+            design?: {
+              overlayColor?: string | null;
+              playButtonBackgroundColor?: string | null;
+              playButtonTextColor?: string | null;
+              playButtonRadius?: string | null;
+              lightboxBackdropColor?: string | null;
+              lightboxFrameColor?: string | null;
+              lightboxFrameWidth?: string | null;
+              /**
+               * CSS-Wert, z. B. 80rem oder 90vw.
+               */
+              lightboxMaxWidth?: string | null;
+              lightboxRadius?: string | null;
+            };
+            /**
+             * Leere Werte übernehmen die zentralen Video-Teaser-Werte der CI.
+             */
+            youtube?: {
+              consentRequired?: boolean | null;
+              consentText?: string | null;
+              consentButtonLabel?: string | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'videoTeaser';
           }
       )[]
     | null;
@@ -438,6 +504,9 @@ export interface UsersSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   tenant?: T;
   alt?: T;
+  sourceType?: T;
+  youtubeUrl?: T;
+  videoThumbnail?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -506,6 +575,51 @@ export interface PagesSelect<T extends boolean = true> {
                     color?: T;
                   };
               maxItems?: T;
+              id?: T;
+              blockName?: T;
+            };
+        videoTeaser?:
+          | T
+          | {
+              headline?:
+                | T
+                | {
+                    text?: T;
+                    tag?: T;
+                    color?: T;
+                    fontSize?: T;
+                  };
+              subheadline?:
+                | T
+                | {
+                    text?: T;
+                    tag?: T;
+                    color?: T;
+                    fontSize?: T;
+                  };
+              durationLabel?: T;
+              teaserMedia?: T;
+              videoMedia?: T;
+              design?:
+                | T
+                | {
+                    overlayColor?: T;
+                    playButtonBackgroundColor?: T;
+                    playButtonTextColor?: T;
+                    playButtonRadius?: T;
+                    lightboxBackdropColor?: T;
+                    lightboxFrameColor?: T;
+                    lightboxFrameWidth?: T;
+                    lightboxMaxWidth?: T;
+                    lightboxRadius?: T;
+                  };
+              youtube?:
+                | T
+                | {
+                    consentRequired?: T;
+                    consentText?: T;
+                    consentButtonLabel?: T;
+                  };
               id?: T;
               blockName?: T;
             };
@@ -596,6 +710,46 @@ export interface CorporateIdentity {
     secondary: string;
     destructive: string;
   };
+  /**
+   * Zentrale Standardwerte für alle Video-Teaser. Einzelne Blöcke können diese Werte gezielt überschreiben.
+   */
+  videoTeaser?: {
+    headline?: {
+      tag?: ('h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') | null;
+      color?: string | null;
+      /**
+       * CSS-Wert, z. B. 2rem oder clamp(1.8rem, 4.5vw, 4.4rem).
+       */
+      fontSize?: string | null;
+    };
+    subheadline?: {
+      tag?: ('h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') | null;
+      color?: string | null;
+      /**
+       * CSS-Wert, z. B. 2rem oder clamp(1.8rem, 4.5vw, 4.4rem).
+       */
+      fontSize?: string | null;
+    };
+    design?: {
+      overlayColor?: string | null;
+      playButtonBackgroundColor?: string | null;
+      playButtonTextColor?: string | null;
+      playButtonRadius?: string | null;
+      lightboxBackdropColor?: string | null;
+      lightboxFrameColor?: string | null;
+      lightboxFrameWidth?: string | null;
+      /**
+       * CSS-Wert, z. B. 80rem oder 90vw.
+       */
+      lightboxMaxWidth?: string | null;
+      lightboxRadius?: string | null;
+    };
+    youtube?: {
+      consentRequired?: boolean | null;
+      consentText?: string | null;
+      consentButtonLabel?: string | null;
+    };
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -611,6 +765,44 @@ export interface CorporateIdentitySelect<T extends boolean = true> {
         primary?: T;
         secondary?: T;
         destructive?: T;
+      };
+  videoTeaser?:
+    | T
+    | {
+        headline?:
+          | T
+          | {
+              tag?: T;
+              color?: T;
+              fontSize?: T;
+            };
+        subheadline?:
+          | T
+          | {
+              tag?: T;
+              color?: T;
+              fontSize?: T;
+            };
+        design?:
+          | T
+          | {
+              overlayColor?: T;
+              playButtonBackgroundColor?: T;
+              playButtonTextColor?: T;
+              playButtonRadius?: T;
+              lightboxBackdropColor?: T;
+              lightboxFrameColor?: T;
+              lightboxFrameWidth?: T;
+              lightboxMaxWidth?: T;
+              lightboxRadius?: T;
+            };
+        youtube?:
+          | T
+          | {
+              consentRequired?: T;
+              consentText?: T;
+              consentButtonLabel?: T;
+            };
       };
   updatedAt?: T;
   createdAt?: T;

@@ -45,7 +45,7 @@ async function run(): Promise<void> {
 
   const logo = await payload.create({
     collection: 'media',
-    data: { alt: 'Sport Auto Plus Logo', tenant: tenant.id },
+    data: { alt: 'Sport Auto Plus Logo', sourceType: 'upload', tenant: tenant.id },
     file: {
       data,
       mimetype: 'image/svg+xml',
