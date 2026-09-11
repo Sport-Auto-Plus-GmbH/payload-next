@@ -1,6 +1,14 @@
 import type { GlobalConfig } from 'payload'
 
 import { isSuperAdmin } from '@/access/isSuperAdmin'
+import {
+  VIDEO_TEASER_DEFAULTS,
+  videoTeaserDesignFields,
+  videoTeaserHeadingStyleFields,
+  videoTeaserYouTubeFields,
+} from '@/blocks/content/videoTeaser/videoTeaserFields'
+
+import { revalidateCorporateIdentityAfterChange } from './hooks/revalidateCorporateIdentityAfterChange'
 
 export const CorporateIdentity: GlobalConfig = {
   slug: 'corporate-identity',
@@ -9,6 +17,9 @@ export const CorporateIdentity: GlobalConfig = {
     // Public read — the Website fetches this without authentication.
     read: () => true,
     update: ({ req }) => isSuperAdmin(req.user),
+  },
+  hooks: {
+    afterChange: [revalidateCorporateIdentityAfterChange],
   },
   fields: [
     {
@@ -53,6 +64,41 @@ export const CorporateIdentity: GlobalConfig = {
           required: true,
           defaultValue: '#990000',
           label: 'Fehler/Warnung (Rot)',
+        },
+      ],
+    },
+    {
+      type: 'group',
+      name: 'videoTeaser',
+      label: 'Video-Teaser',
+      admin: {
+        description:
+          'Zentrale Standardwerte für alle Video-Teaser. Einzelne Blöcke können diese Werte gezielt überschreiben.',
+      },
+      fields: [
+        {
+          type: 'group',
+          name: 'headline',
+          label: 'Headline',
+          fields: videoTeaserHeadingStyleFields(VIDEO_TEASER_DEFAULTS.headline),
+        },
+        {
+          type: 'group',
+          name: 'subheadline',
+          label: 'Subheadline',
+          fields: videoTeaserHeadingStyleFields(VIDEO_TEASER_DEFAULTS.subheadline),
+        },
+        {
+          type: 'group',
+          name: 'design',
+          label: 'Design',
+          fields: videoTeaserDesignFields(VIDEO_TEASER_DEFAULTS.design),
+        },
+        {
+          type: 'group',
+          name: 'youtube',
+          label: 'YouTube & Datenschutz',
+          fields: videoTeaserYouTubeFields(VIDEO_TEASER_DEFAULTS.youtube),
         },
       ],
     },

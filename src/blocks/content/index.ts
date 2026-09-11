@@ -1,5 +1,6 @@
 import { heroTeaser } from './heroTeaser/heroTeaser'
+import { videoTeaser } from './videoTeaser/videoTeaser'
 
-export const contentBlocks = [heroTeaser]
+export const contentBlocks = [heroTeaser, videoTeaser]
 
-export { heroTeaser }
+export { heroTeaser, videoTeaser }
