@@ -295,6 +295,14 @@ Adding a second content block: create `src/blocks/content/<name>/<name>.ts`, add
 `src/blocks/content/index.ts`'s `contentBlocks` array, run `pnpm migrate:create` (a new block
 adds new tables), and `pnpm generate:types`. See `.ai/cms/BLOCKS.md`.
 
+### `vehicleListing` — a Live Vehicle Listing
+
+`src/blocks/content/vehicleListing/` — heading/subheading (same `styledTextField` as
+heroTeaser) plus `maxItems`. Like the old Payload project's vehicle blocks, this only holds
+editorial config — it never stores vehicle data itself. The Website resolves it against the
+Datendrehscheibe's live inventory at render time; see website-next's README ("Vehicle
+Listing & Detail").
+
 ## SEO & Redirects
 
 Two official Payload plugins from `.ai/cms/PLUGINS.md`'s chosen stack, ported over from the

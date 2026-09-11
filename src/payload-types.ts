@@ -218,35 +218,59 @@ export interface Page {
    */
   slug: string;
   layout?:
-    | {
-        headline: {
-          text: string;
-          fontSize?: ('sm' | 'md' | 'lg' | 'xl' | '2xl') | null;
-          /**
-           * Hex-Farbwert, z. B. #323E48.
-           */
-          color?: string | null;
-        };
-        subheadline?: {
-          text?: string | null;
-          fontSize?: ('sm' | 'md' | 'lg' | 'xl' | '2xl') | null;
-          /**
-           * Hex-Farbwert, z. B. #323E48.
-           */
-          color?: string | null;
-        };
-        description?: {
-          text?: string | null;
-          fontSize?: ('sm' | 'md' | 'lg' | 'xl' | '2xl') | null;
-          /**
-           * Hex-Farbwert, z. B. #323E48.
-           */
-          color?: string | null;
-        };
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'heroTeaser';
-      }[]
+    | (
+        | {
+            headline: {
+              text: string;
+              fontSize?: ('sm' | 'md' | 'lg' | 'xl' | '2xl') | null;
+              /**
+               * Hex-Farbwert, z. B. #323E48.
+               */
+              color?: string | null;
+            };
+            subheadline?: {
+              text?: string | null;
+              fontSize?: ('sm' | 'md' | 'lg' | 'xl' | '2xl') | null;
+              /**
+               * Hex-Farbwert, z. B. #323E48.
+               */
+              color?: string | null;
+            };
+            description?: {
+              text?: string | null;
+              fontSize?: ('sm' | 'md' | 'lg' | 'xl' | '2xl') | null;
+              /**
+               * Hex-Farbwert, z. B. #323E48.
+               */
+              color?: string | null;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'heroTeaser';
+          }
+        | {
+            heading: {
+              text: string;
+              fontSize?: ('sm' | 'md' | 'lg' | 'xl' | '2xl') | null;
+              /**
+               * Hex-Farbwert, z. B. #323E48.
+               */
+              color?: string | null;
+            };
+            subheading?: {
+              text?: string | null;
+              fontSize?: ('sm' | 'md' | 'lg' | 'xl' | '2xl') | null;
+              /**
+               * Hex-Farbwert, z. B. #323E48.
+               */
+              color?: string | null;
+            };
+            maxItems: number;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'vehicleListing';
+          }
+      )[]
     | null;
   meta?: {
     title?: string | null;
@@ -461,6 +485,27 @@ export interface PagesSelect<T extends boolean = true> {
                     fontSize?: T;
                     color?: T;
                   };
+              id?: T;
+              blockName?: T;
+            };
+        vehicleListing?:
+          | T
+          | {
+              heading?:
+                | T
+                | {
+                    text?: T;
+                    fontSize?: T;
+                    color?: T;
+                  };
+              subheading?:
+                | T
+                | {
+                    text?: T;
+                    fontSize?: T;
+                    color?: T;
+                  };
+              maxItems?: T;
               id?: T;
               blockName?: T;
             };
