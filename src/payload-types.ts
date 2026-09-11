@@ -71,6 +71,7 @@ export interface Config {
     users: User;
     media: Media;
     pages: Page;
+    redirects: Redirect;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +83,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -256,6 +258,28 @@ export interface Page {
             blockType: 'heroTeaser';
           }
         | {
+            heading: {
+              text: string;
+              fontSize?: ('sm' | 'md' | 'lg' | 'xl' | '2xl') | null;
+              /**
+               * Hex-Farbwert, z. B. #323E48.
+               */
+              color?: string | null;
+            };
+            subheading?: {
+              text?: string | null;
+              fontSize?: ('sm' | 'md' | 'lg' | 'xl' | '2xl') | null;
+              /**
+               * Hex-Farbwert, z. B. #323E48.
+               */
+              color?: string | null;
+            };
+            maxItems: number;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'vehicleListing';
+          }
+        | {
             headline: {
               text: string;
               tag?: ('h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') | null;
@@ -314,9 +338,36 @@ export interface Page {
           }
       )[]
     | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  tenant?: (number | null) | Tenant;
+  from: string;
+  to?: {
+    type?: ('reference' | 'custom') | null;
+    reference?: {
+      relationTo: 'pages';
+      value: number | Page;
+    } | null;
+    url?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -357,6 +408,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -502,6 +557,27 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        vehicleListing?:
+          | T
+          | {
+              heading?:
+                | T
+                | {
+                    text?: T;
+                    fontSize?: T;
+                    color?: T;
+                  };
+              subheading?:
+                | T
+                | {
+                    text?: T;
+                    fontSize?: T;
+                    color?: T;
+                  };
+              maxItems?: T;
+              id?: T;
+              blockName?: T;
+            };
         videoTeaser?:
           | T
           | {
@@ -548,9 +624,33 @@ export interface PagesSelect<T extends boolean = true> {
               blockName?: T;
             };
       };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  tenant?: T;
+  from?: T;
+  to?:
+    | T
+    | {
+        type?: T;
+        reference?: T;
+        url?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

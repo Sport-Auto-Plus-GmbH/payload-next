@@ -1,5 +1,7 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { multiTenantPlugin } from '@payloadcms/plugin-multi-tenant'
+import { redirectsPlugin } from '@payloadcms/plugin-redirects'
+import { seoPlugin } from '@payloadcms/plugin-seo'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -9,10 +11,17 @@ import sharp from 'sharp'
 import { isSuperAdmin } from './access/isSuperAdmin'
 import { Media } from './collections/Media/Media'
 import { Pages } from './collections/Pages/Pages'
+import { createAccess } from './collections/shared/access/createAccess'
+import { deleteAccess } from './collections/shared/access/deleteAccess'
+import { readAccess } from './collections/shared/access/readAccess'
+import { updateAccess } from './collections/shared/access/updateAccess'
 import { Tenants } from './collections/Tenants/Tenants'
 import { Users } from './collections/Users'
 import { CorporateIdentity } from './globals/CorporateIdentity/CorporateIdentity'
 import type { Config } from './payload-types'
+import { revalidateRedirectsAfterChange } from './plugins/redirects/revalidateRedirectsAfterChange'
+import { revalidateRedirectsAfterDelete } from './plugins/redirects/revalidateRedirectsAfterDelete'
+import { generateTitle } from './plugins/seo/generateTitle'
 import { resolvePageLivePreviewUrl } from './utilities/resolvePageLivePreviewUrl'
 
 const filename = fileURLToPath(import.meta.url)
@@ -79,11 +88,36 @@ export default buildConfig({
   }),
   sharp,
   plugins: [
+    // Must run before multiTenantPlugin: it adds the `redirects` collection to the
+    // config, and multiTenantPlugin only injects a `tenant` field into collections
+    // that already exist in `config.collections` by the time it runs (plugins apply
+    // in array order — see payload/dist/config/build.js).
+    redirectsPlugin({
+      // Collections a redirect's "to" field can point to.
+      collections: ['pages'],
+      // Tenant-scoped like Pages/Media (see .ai/backend/MULTI_TENANCY.md): each tenant
+      // manages its own redirects. Note the plugin's default `from` field is globally
+      // unique across all tenants, same known tradeoff as Pages' slug — see
+      // ensureUniqueSlug.ts's comment.
+      overrides: {
+        access: {
+          read: readAccess,
+          create: createAccess,
+          update: updateAccess,
+          delete: deleteAccess,
+        },
+        hooks: {
+          afterChange: [revalidateRedirectsAfterChange],
+          afterDelete: [revalidateRedirectsAfterDelete],
+        },
+      },
+    }),
     multiTenantPlugin<Config>({
       collections: {
         // Every tenant-scoped collection is registered here as it is created.
         media: {},
         pages: {},
+        redirects: {},
       },
       tenantsArrayField: {
         rowFields: [
@@ -101,6 +135,11 @@ export default buildConfig({
         ],
       },
       userHasAccessToAllTenants: (user) => isSuperAdmin(user),
+    }),
+    seoPlugin({
+      collections: ['pages'],
+      uploadsCollection: 'media',
+      generateTitle,
     }),
   ],
 })
